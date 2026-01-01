@@ -133,11 +133,42 @@ def traceNuage(points):
     plt.xlabel("pression hydrostatique")
     plt.ylabel("amplitude de cisaillement max")
     plt.title("Nuage de points")
+    plt.savefig('dangvan_nuage.png')
     plt.show()
 
 # Cellule 12 : Exécution et visualisation
 # points = nuage(100,2*pi,0.01,1)
 # traceNuage(points)
+
+# Tracer le diagramme de Dang Van avec les deux cas et la limite
+points_uniaxial = nuage(100, 2*pi, 0.01, 1)
+points_torsion = nuageOrt(50, 2*pi, 0.01, 1)  # tau_a = 50 for torsion
+
+plt.figure()
+plt.scatter(points_uniaxial[:, 0], points_uniaxial[:, 1], label='Traction-Compression')
+plt.scatter(points_torsion[:, 0], points_torsion[:, 1], label='Torsion')
+
+# Limite de fatigue : ligne droite reliant les maxima
+max_uniaxial = np.max(points_uniaxial[:, 1])
+max_torsion = np.max(points_torsion[:, 1])
+
+# Pour Dang Van, la ligne limite est tau = beta - alpha * p
+# Ici, simplifié : ligne de (0, max_torsion) à (max_p_uniaxial, 0) ou quelque chose
+# En pratique, alpha ≈ 0.3, beta ≈ max_torsion
+alpha = 0.3
+beta = max_torsion
+p_max = np.max(points_uniaxial[:, 0])
+p_line = np.linspace(0, p_max, 100)
+tau_line = beta - alpha * p_line
+plt.plot(p_line, tau_line, 'r-', label='Limite de fatigue')
+
+plt.xlabel("Pression hydrostatique")
+plt.ylabel("Amplitude de cisaillement max")
+plt.title("Diagramme de Dang Van")
+plt.legend()
+plt.grid(True)
+plt.savefig('dangvan_limite.png')
+# plt.show()
 
 class DangVan:
     @staticmethod
